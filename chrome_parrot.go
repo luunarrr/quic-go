@@ -25,6 +25,17 @@ const (
 	chromeMaxDatagramFrameSize = 65536
 )
 
+// ChromeConnectionIDLenInitial is the initial destination connection ID length
+// a Chrome-parroting client uses, exported so that a caller supplying its own
+// DCID through Config.InitialDestConnectionID can match it.
+//
+// The length is the part that shows: quic-go otherwise picks one at random
+// between MinConnectionIDLenInitial and 20, and a browser never does that. A
+// caller that sets its own DCID overrides the generator entirely, so without
+// this constant it would be guessing at a value that has to agree byte for byte
+// or the parroting is undone -- silently, since the connection still works.
+const ChromeConnectionIDLenInitial = protocol.ChromeConnectionIDLenInitial
+
 // chromeParrotTransportParameters adjusts the transport parameters advertised by
 // a Chrome-parroting client. The omitted ones are reset to their protocol
 // defaults, so what we imply by omission matches how we actually behave.

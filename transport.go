@@ -249,6 +249,10 @@ func (t *Transport) DialEarly(ctx context.Context, addr net.Addr, tlsConf *tls.C
 	return t.dial(ctx, addr, "", tlsConf, conf, true)
 }
 
+// host is retained to keep this fork's signature aligned with upstream; the only
+// consumer, setTLSConfigServerName below, is disabled here.
+//
+//nolint:unparam // see above
 func (t *Transport) dial(ctx context.Context, addr net.Addr, host string, tlsConf *tls.Config, conf *Config, use0RTT bool) (*Conn, error) {
 	if err := t.init(t.isSingleUse); err != nil {
 		return nil, err
@@ -295,9 +299,19 @@ func (t *Transport) doDial(
 	if config != nil && config.ChromeParrot {
 		genInitialConnID = protocol.GenerateChromeConnectionIDForInitial
 	}
-	destConnID, err := genInitialConnID()
-	if err != nil {
-		return nil, err
+	// An explicitly configured DCID wins over either generator. It is not a
+	// connection ID in the usual sense but a token the peer verifies before the
+	// handshake begins, so a generated one -- however well shaped -- is simply
+	// not the value the far end is waiting for.
+	var destConnID protocol.ConnectionID
+	if config != nil && len(config.InitialDestConnectionID) > 0 {
+		destConnID = protocol.ParseConnectionID(config.InitialDestConnectionID)
+	} else {
+		var err error
+		destConnID, err = genInitialConnID()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	t.mutex.Lock()

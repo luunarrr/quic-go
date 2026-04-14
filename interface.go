@@ -205,6 +205,9 @@ type Config struct {
 	// Client side only; it has no effect on a listener. Because it pins the
 	// values above, settings that conflict with Chrome's are ignored.
 	ChromeParrot bool
+	// InitialDestConnectionID, if set, is used as the initial destination connection ID
+	// when dialing a new connection, instead of a randomly generated one.
+	InitialDestConnectionID []byte
 }
 
 // ClientInfo contains information about an incoming connection attempt.

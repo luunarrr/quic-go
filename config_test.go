@@ -129,6 +129,8 @@ func configWithNonZeroNonFunctionFields(t *testing.T, chromeParrot bool) *Config
 			f.Set(reflect.ValueOf(int64(1200)))
 		case "DisablePathManager":
 			f.Set(reflect.ValueOf(true))
+		case "InitialDestConnectionID":
+			f.Set(reflect.ValueOf([]byte{1, 2, 3, 4, 5, 6, 7, 8}))
 		case "DisableVersionNegotiationPackets":
 			f.Set(reflect.ValueOf(true))
 		case "InitialPacketSize":
